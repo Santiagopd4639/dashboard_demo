@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Conversacion {
+  telefono    String   @id @db.Text
+  paso        Int      @default(0)
+  datos       Json     @default(dbgenerated("'{}'::jsonb")) @db.JsonB
+  creadoEn    DateTime @default(now()) @map("creado_en") @db.Timestamp(6)
+  actualizado DateTime @updatedAt @map("actualizado_en") @db.Timestamp(6)
+
+  @@map("conversaciones")
+}
+
+model Incidencia {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  telefono            String                @db.Text
+  estado              String                @default("pendiente") @db.Text
+  datos               Json                  @db.JsonB
+  urlPdf              String?               @map("url_pdf") @db.Text
+  lat                 Float?                @db.DoublePrecision
+  lng                 Float?                @db.DoublePrecision
+  notificado          Boolean               @default(false)
+  completadoEn        DateTime?             @map("completado_en") @db.Timestamp(6)
+  incidenciaReview    String?               @map("incidencia_review") @db.Text
+  idTaller            String?               @map("id_taller") @db.Uuid
+  creadoEn            DateTime              @default(now()) @map("creado_en") @db.Timestamp(6)
+  actualizado         DateTime              @updatedAt @map("actualizado_en") @db.Timestamp(6)
+  aceptacionIncidencia AceptacionIncidencia?
+
+  @@index([telefono], map: "incidencias_telefono_idx")
+  @@index([estado], map: "incidencias_estado_idx")
+  @@map("incidencias")
+}
+
+model Taller {
+  id                    String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre                String                 @db.Text
+  capacidades           Json                   @default(dbgenerated("'[]'::jsonb")) @db.JsonB
+  lat                   Float?                 @db.DoublePrecision
+  lng                   Float?                 @db.DoublePrecision
+  radioKm               Float                  @default(20) @map("radio_km") @db.DoublePrecision
+  activo                Boolean                @default(true)
+  creadoEn              DateTime               @default(now()) @map("creado_en") @db.Timestamp(6)
+  usuariosTalleres      UsuarioTaller[]
+  aceptacionesIncidencias AceptacionIncidencia[]
+
+  @@map("talleres")
+}
+
+model Usuario {
+  id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email            String         @unique @db.Text
+  passwordHash     String         @map("password_hash") @db.Text
+  rol              String         @default("usuario") @db.Text
+  activo           Boolean        @default(true)
+  creadoEn         DateTime       @default(now()) @map("creado_en") @db.Timestamp(6)
+  usuariosTalleres UsuarioTaller[]
+
+  @@map("usuarios")
+}
+
+model UsuarioTaller {
+  usuarioId String  @map("usuario_id") @db.Uuid
+  tallerId  String  @map("taller_id") @db.Uuid
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  taller    Taller  @relation(fields: [tallerId], references: [id], onDelete: Cascade)
+
+  @@id([usuarioId, tallerId])
+  @@map("usuarios_talleres")
+}
+
+model AceptacionIncidencia {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  incidenciaId String   @unique @map("incidencia_id") @db.Uuid
+  tallerId    String    @map("taller_id") @db.Uuid
+  aceptadoEn  DateTime  @default(now()) @map("aceptado_en") @db.Timestamp(6)
+  incidencia  Incidencia @relation(fields: [incidenciaId], references: [id], onDelete: Cascade)
+  taller      Taller     @relation(fields: [tallerId], references: [id], onDelete: Restrict)
+
+  @@map("aceptaciones_incidencias")
+}
