@@ -37,7 +37,7 @@ export async function GET(
     user.talleres.some((t) => t.id === incidencia.aceptacionIncidencia?.tallerId);
 
   if (!canSee && !acceptedByMine) {
-    return jsonError("Sin permisos para ver esta incidencia", 403);
+    return jsonError("Sin permiso para ver esta incidencia", 403);
   }
 
   return NextResponse.json({ incidencia });
