@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ReactNode } from "react";
 import { AuthUser, isAdminRole } from "@/lib/auth";
 import { LogoutButton } from "@/components/logout-button";
@@ -27,7 +28,14 @@ export function DashboardShell({ user, children }: Props) {
       <div className="mx-auto grid min-h-screen max-w-[1480px] grid-cols-1 gap-4 p-4 md:grid-cols-[260px_1fr]">
         <aside className="rounded-2xl border border-slate-200 bg-white p-5 md:sticky md:top-4 md:h-[calc(100vh-2rem)]">
           <div className="mb-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-700">Recacor Demo</p>
+            <Image
+              src="/recacor-logo.png"
+              alt="Recacor"
+              width={220}
+              height={56}
+              priority
+              className="h-auto w-auto max-w-[220px]"
+            />
             <h1 className="text-2xl font-semibold leading-tight text-slate-900">Control Center</h1>
           </div>
           <nav className="flex flex-col gap-2">
