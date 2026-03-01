@@ -241,15 +241,15 @@ export function MonthlyTimingChart({ samples, talleres }: Props) {
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-slate-100/60 p-3">
+        <div className="rounded-xl border border-white/20 bg-white/10 p-3 backdrop-blur-md">
           <p className="text-xs uppercase tracking-wide text-slate-500">Apertura a aceptacion</p>
           <p className="mt-1 text-lg font-semibold text-slate-900">{formatMinutes(openAvg)}</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-slate-100/60 p-3">
+        <div className="rounded-xl border border-white/20 bg-white/10 p-3 backdrop-blur-md">
           <p className="text-xs uppercase tracking-wide text-slate-500">Aceptacion a completada</p>
           <p className="mt-1 text-lg font-semibold text-slate-900">{formatMinutes(completeAvg)}</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-slate-100/60 p-3">
+        <div className="rounded-xl border border-white/20 bg-white/10 p-3 backdrop-blur-md">
           <p className="text-xs uppercase tracking-wide text-slate-500">Puntos</p>
           <p className="mt-1 text-lg font-semibold text-slate-900">{points.length}</p>
         </div>
@@ -276,7 +276,7 @@ export function MonthlyTimingChart({ samples, talleres }: Props) {
       {points.length === 0 ? (
         <p className="mt-5 text-sm text-slate-600">No hay datos para esta combinacion.</p>
       ) : (
-        <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-slate-100/40 p-3">
+        <div className="mt-4 overflow-x-auto rounded-xl border border-white/20 bg-white/5 p-3 backdrop-blur-md">
           <svg viewBox={`0 0 ${chartData.width} ${chartData.height}`} className="min-w-[780px] w-full">
             <defs>
               <linearGradient id="openArea" x1="0" y1="0" x2="0" y2="1">
