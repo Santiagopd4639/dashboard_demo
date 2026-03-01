@@ -5,6 +5,7 @@ import { getAuthUserFromRequest, isAdminRole } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { calculateDistanceKm, deduceAveriaType, isCompatible } from "@/lib/incidencias";
 import { jsonError } from "@/lib/http";
+import { postWebhookJson } from "@/lib/webhook";
 
 const bodySchema = z.object({
   tallerId: z.string().uuid(),
@@ -75,20 +76,13 @@ export async function POST(
     const webhookUrl = process.env.N8N_ACCEPT_WEBHOOK_URL;
     if (webhookUrl) {
       try {
-        const webhookResponse = await fetch(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            incidenciaId,
-            telefono: incidencia.telefono,
-            tallerId: taller.id,
-            tallerNombre: taller.nombre,
-            mensaje: "incidencia aceptada",
-          }),
+        await postWebhookJson(webhookUrl, {
+          incidenciaId,
+          telefono: incidencia.telefono,
+          tallerId: taller.id,
+          tallerNombre: taller.nombre,
+          mensaje: "incidencia aceptada",
         });
-        if (!webhookResponse.ok) {
-          throw new Error(`Webhook status ${webhookResponse.status}`);
-        }
       } catch (error) {
         warning = "Aceptacion guardada, pero fallo el webhook de n8n.";
         console.error("[accept-webhook-error]", error);

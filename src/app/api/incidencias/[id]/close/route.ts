@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthUserFromRequest, isAdminRole } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { jsonError } from "@/lib/http";
+import { postWebhookJson } from "@/lib/webhook";
 
 const COMPLETED_STATES = new Set([
   "completada",
@@ -77,20 +78,13 @@ export async function POST(
     const webhookUrl = process.env.N8N_CLOSE_WEBHOOK_URL;
     if (webhookUrl) {
       try {
-        const webhookResponse = await fetch(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            incidenciaId,
-            telefono: incidencia.telefono,
-            tallerId: incidencia.aceptacionIncidencia.taller.id,
-            tallerNombre: incidencia.aceptacionIncidencia.taller.nombre,
-            mensaje: "incidencia cerrada",
-          }),
+        await postWebhookJson(webhookUrl, {
+          incidenciaId,
+          telefono: incidencia.telefono,
+          tallerId: incidencia.aceptacionIncidencia.taller.id,
+          tallerNombre: incidencia.aceptacionIncidencia.taller.nombre,
+          mensaje: "incidencia cerrada",
         });
-        if (!webhookResponse.ok) {
-          throw new Error(`Webhook status ${webhookResponse.status}`);
-        }
       } catch (error) {
         warning = "Cierre guardado, pero fallo el webhook de n8n.";
         console.error("[close-webhook-error]", error);
