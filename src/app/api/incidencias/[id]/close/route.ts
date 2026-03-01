@@ -66,13 +66,14 @@ export async function POST(
     }
 
     const completadoEn = new Date();
-    await db.$executeRaw`
-    UPDATE incidencias
-    SET estado = 'completada',
-        completado_en = ${completadoEn},
-        incidencia_review = ${incidenciaReview}
-    WHERE id = CAST(${incidenciaId} AS uuid)
-  `;
+    await db.incidencia.update({
+      where: { id: incidenciaId },
+      data: {
+        estado: "completada",
+        completadoEn,
+        incidenciaReview,
+      },
+    });
 
     let warning: string | undefined;
     const webhookUrl = process.env.N8N_CLOSE_WEBHOOK_URL;
