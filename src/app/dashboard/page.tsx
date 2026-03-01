@@ -35,6 +35,16 @@ function completedState(estado: string) {
   ].includes(s);
 }
 
+function pendingState(estado: string) {
+  const s = estado.trim().toLowerCase().replaceAll("_", " ");
+  return s === "aceptacion" || s === "en aceptacion" || s === "pendiente";
+}
+
+function acceptedState(estado: string) {
+  const s = estado.trim().toLowerCase();
+  return s === "aceptada";
+}
+
 
 export default async function DashboardHomePage() {
   const user = await getAuthUserFromCookies();
@@ -71,11 +81,9 @@ export default async function DashboardHomePage() {
   ]);
 
   const total = incidencias.length;
-  const pendientes = incidencias.filter((i) =>
-    "aceptacionIncidencia" in i ? i.aceptacionIncidencia === null : i.aceptacion === null,
-  ).length;
-  const aceptadas = total - pendientes;
-  const noNotificadas = incidencias.filter((i) => !i.notificado).length;
+  const pendientes = incidencias.filter((i) => pendingState(i.estado)).length;
+  const aceptadas = incidencias.filter((i) => acceptedState(i.estado)).length;
+  const cerradas = incidencias.filter((i) => completedState(i.estado)).length;
   const conPdf = incidencias.filter((i) => Boolean(i.urlPdf)).length;
 
   const timingSamples = incidencias
@@ -124,10 +132,10 @@ export default async function DashboardHomePage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        <Card label="Total visibles" value={total} />
-        <Card label="Pendientes visibles" value={pendientes} />
-        <Card label="Aceptadas visibles" value={aceptadas} />
-        <Card label="No notificadas visibles" value={noNotificadas} />
+        <Card label="Incidencias visibles" value={total} />
+        <Card label="Incidencias pendientes" value={pendientes} />
+        <Card label="Incidencias aceptadas" value={aceptadas} />
+        <Card label="Incidencias cerradas" value={cerradas} />
         <Card label="Con PDF visibles" value={conPdf} />
       </div>
 
